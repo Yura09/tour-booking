@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/main">
+
+<!--/*@thymesVar id="tour" type="com.touramigo.tour.TourDetails"*/-->
+<title layout:fragment="title">[[${tour.title}]]</title>
+<object layout:fragment="meta">
+    <meta name="title" th:content="${tour.title + ' | Tour Amigo'}">
+    <meta  name="description" th:content="${'Book ' + tour.title + ' by ' + tour.operatorName + ' online with Tour Amigo.'}">
+    <meta th:if="${tour.primaryImageUrl != null}" property="og:image" th:content="${tour.primaryImageUrl}" />
+</object>
+
+<body>
+<div layout:fragment="content">
+    <!--/*@thymesVar id="tour" type="com.touramigo.tour.TourDetails"*/-->
+    <!--/*@thymesVar id="tours" type="java.util.List<com.touramigo.tour.SearchResult>"*/-->
+    <!--/*@thymesVar id="deviceType" type="java.lang.String"*/-->
+    <div class="tour-details-container compare-content container">
+
+        <div class="row">
+            <div class="col-md-12">
+                <button id="backToSearchResults" class="btn btn-default btn-raised btn-top" type="button"><i class="fa fa-angle-left"></i> Back</button>
+                <a th:if="${tour.countries != null && tour.countries.size() > 0}" th:href="${'/search-tours?whereTo=' + tour.countries[0]}" class="btn btn-default btn-raised btn-top">See similar tours</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!--------- Tour title -------->
+            <div class="col-md-9">
+                <div class="tour-details-header">
+                    <div class="tour-details-image">
+                        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+                            <ol class="carousel-indicators">
+                                <li th:each="image, iter : ${tour.imageUrls}" data-target="#carousel-example-generic"
+                                    th:classappend="${iter.index == 0} ? 'active'"
+                                    th:attr="data-slide-to=${iter.index}">
+                                </li>
+                            </ol>
+                            <div class="carousel-inner" role="listbox">
+                                <div th:each="image, iter : ${tour.imageUrls}"
+                                     th:classappend="${iter.index == 0} ? 'active' " class="item">
+                                    <img th:src="${T(com.touramigo.tour.TourDetails).getResizedImageUrl(image, 850, 850)}"
+                                         th:srcset="${T(com.touramigo.tour.TourDetails).getResizedImageUrl(image, 850, 850, 2)} + ' 2x'"
+                                         class="img-responsive center-block" th:alt="${tour.title + ' Tour Amigo'}"/>
+                                </div>
+                                <div th:if="${tour.imageUrls.size() == 0}">
+                                    <img src="/image/missing_tour_image.png" style="width: 100%">
+                                </div>
+                            </div>
+                            <a th:if="${tour.imageUrls.size() > 1}" class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                                <span class="fa fa-chevron-left  vertical-center" aria-hidden="true"></span>
+                                <span class="sr-only">Previous Image</span>
+                            </a>
+                            <a th:if="${tour.imageUrls.size() > 1}" class="right carousel-control" href="#carousel-example-generic" role="button"
+                               data-slide="next">
+                                <span class="fa fa-chevron-right vertical-center" aria-hidden="true"></span>
+                                <span class="sr-only">Next Image</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div th:if="${tour.duration != null}" class="responsive-label">
+                        <span th:text="${tour.duration}">2</span>
+                        <span th:text="${tour.duration > 1} ? 'days' : 'day'">days</span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="tour-details-inner-container">
+                                <h1 th:text="${tour.title}"></h1>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row sub-menu">
+                        <div class="col-sm-12">
+                            <a href="#highlights">Highlights</a>
+                            <a href="#itinerary">Itinerary</a>
+                            <a href="#included">What's included</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 hidden-md hidden-lg tour-details-side">
+                        <div th:replace="tour/tourSideInfo :: tourSideInfo(${tour})"></div>
+                    </div>
+                </div>
+
+                <!----- Tour details ------->
+                <div class="row tour-items-container">
+                    <div class="col-md-12 tour-details-main-container">
+                        <div class="tour-details-main">
+
+                            <div class="tour-item-detail" th:if="${tour.highlights != null && !tour.highlights.isEmpty()}" id="highlights">
+                                <h2>Highlights</h2>
+                                <ul class="tour-highlights fa-ul">
+                                    <li th:each="highlight : ${tour.highlights}">
+                                        <i class="fa-li fa fa-check-circle"></i> <span th:utext="${highlight}"></span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="tour-item-detail" id="itinerary">
+                                <h2>Itinerary</h2>
+                                <p th:utext="${tour.description}"></p>
+                                <div class="item-text">
+                                    <span th:if="${tour.itineraryHeaders != null && tour.itineraryHeaders.size() > 0}">
+                                        <a id="expandItinerary" th:if="${tour.itineraryDetails != null && tour.itineraryDetails.size() > 0}"><i class="fa fa-plus-square-o"></i> <span>EXPAND DAILY ITINERARY</span></a>
+                                        <ul>
+                                            <li th:each="index : ${#numbers.sequence( 0, #arrays.length(tour.itineraryHeaders)-1)}">
+                                                <span class="itinerary-header" th:text="${tour.itineraryHeaders[index]}"></span>
+                                                <div class="itinerary-details" th:text="${tour.itineraryDetails != null && tour.itineraryDetails.size() > index ? tour.itineraryDetails[index] : ''}" style="display: none;"></div>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                    <ul th:if="${(tour.itineraryHeaders == null || tour.itineraryHeaders.size() == 0) && (tour.itinerary != null && !tour.itinerary.isEmpty())}">
+                                        <li class="itinerary-header" th:each="itineraryText : ${tour.itinerary}" th:utext="${itineraryText}">
+                                        </li>
+                                    </ul>
+                                    <a th:href="${'/tour/' + tour.operatorCode + '/' + tour.sku + '/itinerary.pdf'}"
+                                       target="_blank">Download full itinerary</a>
+                                </div>
+                            </div>
+
+                            <div class="tour-item-detail" id="included">
+                                <h2>What's Included</h2>
+                                <div class="included-option" th:if="${tour.accommodationDetail != null}">
+                                    <div class="included-option-title">
+                                        <div class="title-text">Accommodation</div>
+                                        <div th:if="${tour.accommodationType != null && !tour.accommodationType.isEmpty()}" class="value-text" th:text="${#strings.listJoin(tour.accommodationType, ',')}">12 nights</div>
+                                        <div th:if="${tour.accommodationType == null || tour.accommodationType.isEmpty()}" class="value-text" th:text="${(tour.accommodationDetail == null ? '0' : tour.accommodationDetail.size()) + ' accommodations'}">12 nights</div>
+                                        <div th:if="${tour.accommodationDetail != null && !tour.accommodationDetail.isEmpty()}" class="expand"><a><i class="fa fa-plus-square-o"></i> <span>EXPAND</span></a></div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="included-option-details" style="display: none;">
+                                        <h4>Accommodation details</h4>
+                                        <ul>
+                                            <li th:each="accomodation : ${tour.accommodationDetail}" th:utext="${accomodation}">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <hr>
+                                </div>
+
+                                <div class="included-option"  th:if="${tour.mealsDetail} != null">
+                                    <div class="included-option-title">
+                                        <div class="title-text">Meals</div>
+                                        <div class="value-text" th:text="${tour.mealsDetail}">1 dinner</div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <hr>
+                                </div>
+
+                                <div class="included-option" th:if="${tour.fitness != null}">
+                                    <div class="included-option-title">
+                                        <div class="title-text">Activities</div>
+                                        <div class="value-text" th:text="${'difficulty level ' + tour.fitness}">easy</div>
+                                        <div th:if="${tour.activitiesIncluded != null && !tour.activitiesIncluded.isEmpty()}" class="expand"><a><i class="fa fa-plus-square-o"></i> <span>EXPAND</span></a></div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="included-option-details" style="display: none;">
+                                        <h4>Activities included</h4>
+                                        <ul>
+                                            <li th:each="activityIncluded : ${tour.activitiesIncluded}" th:utext="${activityIncluded}">
+                                            </li>
+                                        </ul>
+
+                                        <span th:if="${tour.activitiesExtra != null && !tour.activitiesExtra.isEmpty()}">
+                                            <h4>Activities extra</h4>
+                                            <ul>
+                                                <li th:each="activityExtra : ${tour.activitiesExtra}" th:utext="${activityExtra}">
+                                                </li>
+                                            </ul>
+                                        </span>
+                                    </div>
+                                    <hr>
+                                </div>
+                                <div class="included-option"  th:if="${tour.transport} != null">
+                                    <div class="included-option-title">
+                                        <div class="title-text">Transport</div>
+                                        <div class="value-text" th:text="${#strings.listJoin(tour.transport, ',')}">Plane</div>
+                                        <div th:if="${tour.cities != null && !tour.cities.isEmpty()}" class="expand"><a><i class="fa fa-plus-square-o"></i> <span>EXPAND</span></a></div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="included-option-details" style="display: none;">
+                                        <h4>Places visited</h4>
+                                        <ul>
+                                            <li th:each="city : ${tour.cities}" th:utext="${city}">
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <hr>
+                                </div>
+
+                                <div class="included-option"  th:if="${tour.maxGroupSize} != null">
+                                    <div class="included-option-title">
+                                        <div class="title-text">Group</div>
+                                        <div class="value-text" th:text="${tour.maxGroupSize != 9999 ? 'max group size ' + tour.maxGroupSize : 'not limited'}">max group size</div>
+                                        <div th:if="${tour.tourPersonnel != null || tour.ageRange != null}" class="expand"><a><i class="fa fa-plus-square-o"></i> <span>EXPAND</span></a></div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="included-option-details" style="display: none;">
+                                        <div th:if="${tour.tourPersonnel} != null">
+                                            <h4>Tour personnel</h4>
+                                            <div th:text="${tour.tourPersonnel}" class="item-text"> text goes here</div>
+                                        </div>
+                                        <div th:if="${tour.ageRange} != null">
+                                            <h4>Age:</h4>
+                                            <div th:text="${tour.ageRange}" class="item-text">18 - 25 years old</div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                </div>
+                            </div>
+
+                            <div class="tour-item-detail" id="tourOperator">
+                                <h2>Tour Operator</h2>
+                                <div class="item-text operator-logo">
+                                    <img th:alt="${tour.operatorName}" th:src="${tour.operatorLogoUrl}"/><br>
+                                    <p th:text="${tour.operatorDescription}"></p>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+
+                            <div class="tour-item-detail">
+                                <div id="touramigo-component-availability" th:attr="data-departures=${availableDatesJson}, data-tour=${tourJson}">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-md-3 hidden-sm hidden-xs tour-details-side">
+                <div th:replace="tour/tourSideInfo :: tourSideInfo(${tour})"></div>
+            </div>
+        </div>
+
+        <div class="row search-results-container">
+            <div class="col-md-9">
+                <h2>Similar Tours</h2>
+
+                <div th:each="similarTour: ${tours}">
+                    <div th:replace="search/compareContent :: compareContent(${similarTour})"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div th:each="tourCountry: ${tour.countries}" class="col-md-8 other-tours">
+                <a th:href="${'/search-tours?whereTo=' + tourCountry}" th:text="${'Compare ' + tourCountry + ' tours'}">Compare tours</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script layout:fragment="custom-script">
+    /*<![CDATA[*/
+    $(function () {
+        var facebookButtons = $('[data-action="shareOnFacebook"]');
+        var facebookUrlTemplate = 'http://www.facebook.com/sharer.php?u=:url';
+        facebookButtons.on('click', function() {
+            window.open(facebookUrlTemplate.replace(':url', encodeURIComponent('https://touramigo.com' + window.location.pathname + window.location.search)), 'Share', 'width=500,height=300')
+        });
+
+        var twitterButtons = $('[data-action="shareOnTwitter"]');
+        var twitterUrlTemplate = 'https://twitter.com/intent/tweet?source=tweetbutton&url=:url';
+        twitterButtons.on('click', function() {
+            window.open(twitterUrlTemplate.replace(':url', encodeURIComponent('https://touramigo.com' + window.location.pathname + window.location.search)), 'Share', 'width=500,height=300')
+        });
+
+
+        $('#backToSearchResults').on('click', function () {
+            window.history.back();
+        });
+
+        $('.itinerary-header').each(function(){ var $p = $(this); $p.html($p.html().replace(/^(\w+\s+\w+)/, '<strong>$1</strong>')); });
+
+        $('.expand').on('click', function () {
+            $(this).parents('.included-option').find('.included-option-details').toggle();
+        });
+
+        $('#expandItinerary').on('click', function () {
+            $('.itinerary-details').toggle();
+        });
+
+        var availableDates = [(${availableDatesJson})];
+        var tourDuration = [(${tour.duration != null ? tour.duration : 1})];
+        var productCodeInput = $('[name="productCode"]');
+        var inputDateFormat = 'dd-mm-yyyy';
+        var queryMomentDateFormat = 'YYYY-MM-DD';
+        var inputMomentDateFormat = 'DD-MM-YYYY';
+        var basePriceContainer = $('.base-price-value');
+        var oldPriceContainer = $('.old-price-value');
+        var oldPriceCurrencyContainer = $('.old-price-currency');
+        var maxDiscount = [(${tour.discount != null && tour.discount != '' ? tour.discount : 1})];
+        var priceOff = $('.price-off-text');
+        var oldPriceRow = $('.old-price');
+        var baseTourPrice = basePriceContainer.html();
+        var oldTourPrice = oldPriceContainer.html();
+        var bookTourButton = $('.book-tour');
+        var currentDate = new Date();
+        currentDate.setHours(0,0,0,0);
+        var startDates = [];
+        var oldDate;
+        for (var i = 0, availableDatesLength = availableDates.length; i < availableDatesLength; i++) {
+            availableDates[i].date = moment(availableDates[i].date, queryMomentDateFormat).format(inputMomentDateFormat);
+            startDates.push(availableDates[i].date);
+        }
+
+        var tourDepartureStart = $('.check-availability-btn');
+        tourDepartureStart.datepicker({
+            orientation: 'bottom',
+            autoclose: false,
+            beforeShowDay: function (dateField) {
+                var enabled = true;
+                var selectedDate = moment(dateField).format(inputMomentDateFormat);
+                if (startDates.indexOf(selectedDate) > -1) {
+                    var departure  = availableDates.filter(function(departure){return departure.date === selectedDate;})[0];
+                    var additionalClasses = '';
+                    if ((departure.availability && departure.availability <= 5) || departure.status === 'REQUEST') {
+                        additionalClasses = ' limited';
+                    }
+                    if ((departure.availability != null && departure.availability == 0) || departure.status === 'CLOSED') {
+                        additionalClasses = ' closed';
+                        enabled = false;
+                    }
+
+                    var price = '&nbsp;<br><small class="date-price">$' + departure.price + '</small>';
+                    if (departure.promotionPrice && departure.promotionPrice < departure.price) {
+                        price = '<small class="date-price date-price-inactive">$' + departure.price + '</small><br><small class="date-price">$' + departure.promotionPrice + '</small>'
+                    }
+
+                    return {
+                        enabled: enabled,
+                        classes: 'highlighted' + additionalClasses,
+                        content: moment(dateField).date() + '<br>' + price
+                    }
+                }
+
+                return {
+                    enabled: false
+                }
+            },
+            startDate: currentDate,
+            format: inputDateFormat
+        }).on('changeDate', function (event) {
+            if (event.date) {
+                if (typeof ga !=='undefined') {
+                    ga('send', 'event', 'tour', 'selectDate');
+                }
+                var selectedDate = moment(event.date, inputMomentDateFormat);
+                var departure  = availableDates.filter(function(departure){return departure.date === selectedDate.format(inputMomentDateFormat)})[0];
+                $('.start-date').val(selectedDate.format(inputMomentDateFormat));
+                tourDepartureStart.removeClass('btn-primary').addClass('btn-default');
+                tourDepartureStart.find('span').html(selectedDate.format(inputMomentDateFormat) + ' - ' + selectedDate.add(tourDuration, 'days').format(inputMomentDateFormat));
+                if(departure.promotionPrice && departure.promotionPrice < departure.price) {
+                    basePriceContainer.html(departure.promotionPrice);
+                    oldPriceContainer.html(departure.price);
+                    priceOff.html(departure.discount + '% off');
+                    oldPriceRow.show();
+                } else {
+                    basePriceContainer.html(departure.price);
+                    oldPriceContainer.html('');
+                    priceOff.html('');
+                    oldPriceRow.hide();
+                }
+                productCodeInput.val(departure.productCode);
+
+                bookTourButton.show();
+
+                oldDate = tourDepartureStart.eq(0).is(":visible") ? tourDepartureStart.eq(0).datepicker('getDate') : tourDepartureStart.eq(1).datepicker('getDate');
+                baseTourPrice = basePriceContainer.html();
+                oldTourPrice = oldPriceContainer.html();
+                tourDepartureStart.datepicker('hide');
+                oldPriceCurrencyContainer.show();
+            } else {
+                $('.start-date').val('');
+                tourDepartureStart.addClass('btn-primary').removeClass('btn-default');
+                tourDepartureStart.find('span').html('CHECK AVAILABILITY');
+                basePriceContainer.html(baseTourPrice);
+                oldPriceContainer.html('');
+                if (maxDiscount) {
+                    priceOff.html('-' + maxDiscount + '% of selected departures');
+                    oldPriceCurrencyContainer.hide();
+                    oldPriceRow.show();
+                } else {
+                    oldPriceRow.hide();
+                }
+
+                bookTourButton.hide();
+            }
+        }).on('show', function () {
+            $('.datepicker').addClass('booking-datepicker');
+            var buttonPane = $('.datepicker tfoot');
+            var extendedContent = buttonPane.find('#extendedContent');
+            if (!extendedContent.length) {
+                buttonPane.append('<tr><th colspan="7" id="extendedContent"></th></tr>');
+                extendedContent = buttonPane.find('#extendedContent');
+                extendedContent.append('<div class="legend"><div class="legend-color legend-color-available">&nbsp;</div> AVAILABLE</div><div class="legend"><div class="legend-color legend-color-limited">&nbsp;</div> LIMITED AVAILABILITY / ON REQUEST</div><div class="legend"><div class="legend-color legend-color-closed">&nbsp;</div> SOLD OUT / CLOSED</div>')
+                $( '<button>', {
+                    text: 'Cancel'
+                }).appendTo(extendedContent)
+                    .addClass('btn btn-default btn-raised date-cancel')
+                    .on('click', function () {
+                        if (oldDate) {
+                            tourDepartureStart.datepicker('setDate', oldDate);
+                        } else {
+                            tourDepartureStart.datepicker('clearDates');
+
+                            basePriceContainer.html(baseTourPrice);
+                            oldPriceContainer.html('');
+                            if (maxDiscount) {
+                                priceOff.html('-' + maxDiscount + '% of selected departures');
+                                oldPriceCurrencyContainer.hide();
+                                oldPriceRow.show();
+                            } else {
+                                oldPriceRow.hide();
+                            }
+                        }
+
+                        tourDepartureStart.datepicker('hide');
+                    });
+            }
+
+            var dateString = readCookie('lastSearchedMonth');
+            if (dateString !== undefined && dateString != '') {
+                $(this).datepicker('update', moment(dateString, 'MM-YYYY').toDate());
+            }
+        });
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: amigo-users-service
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: amigo-config-service
+      fail-fast: true
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: ${DISCOVERY_URL:http://localhost:8761/eureka/}
+

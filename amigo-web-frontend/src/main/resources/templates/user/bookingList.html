@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/main">
+<body>
+<div layout:fragment="content">
+    <!--/*@thymesVar id="success" type="java.lang.String"*/-->
+    <!--/*@thymesVar id="bookings" type="java.util.List<com.touramigo.booking.Booking>"*/-->
+    <div class="container info-container">
+        <div class="row">
+            <th:block th:if="${success}">
+                <div th:replace="fragments/validation/alert :: alert (type='success', message=${success}, errors=null)">
+                    Success
+                </div>
+            </th:block>
+            <div class="col-sm-12 col-md-12 info-card">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h1>User bookings</h1>
+                        <div th:replace="user/profileTabs :: profileTabs ('booking')"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr class="headers">
+                                    <th>Tour Name</th>
+                                    <th>Operator</th>
+                                    <th>Available</th>
+                                    <th>Booking Ref</th>
+                                    <th>Departure Date</th>
+                                    <th>Booking Created</th>
+                                    <th>Total Amount</th>
+                                    <th>Action</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${bookings == null || bookings.size() == 0}" class="norecords-tr">
+                                    <td class="norecords-td" colspan="9">
+                                        No Records Found
+                                    </td>
+                                </tr>
+                                <tr class='user-booking' th:if="${bookings != null && bookings.size()>0}" th:each="booking: ${bookings}">
+                                    <td th:text="${booking.tourTitle}">Ephesus Experience - Independent</td>
+                                    <td th:text="${booking.tourOperatorTitle}">Peregrine Adventures</td>
+                                    <td th:text="${booking.requestStatus}">Not confirmed</td>
+                                    <td th:text="${#strings.toUpperCase(booking.bookingToken)}">RB3CUSOB</td>
+                                    <td th:text="${booking.startDateLongString}">01 Mar 2017</td>
+                                    <td th:text="${booking.dateCreatedLongString}">15 Feb 2017</td>
+                                    <td>
+                                        $<span th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'COMMA', 2, 'POINT')}">0</span>
+                                        <small th:text="${booking.currency}">USD</small>
+                                    </td>
+                                    <td>
+                                        <a th:href="${'/user/booking/' + booking.id + '/details'}" href="/user/booking/123/details" class="btn btn-xs btn-default btn-raised btn-wide btn-action booking-details"><i class="fa fa-eye 2x"></i> Details</a><br>
+                                        <a th:if="${booking.isEditable()}" th:href="${'/user/booking/' + booking.id + '/change'}" href="/user/booking/123/change" class="btn btn-xs btn-default btn-raised btn-wide btn-action booking-change"><i class="fa fa-pencil-square-o 2x"></i> Change</a><br>
+                                        <a th:if="${booking.isEditable()}" th:href="${'/user/booking/' + booking.id + '/cancel'}" href="/user/booking/123/cancel" class="btn btn-xs btn-danger btn-raised btn-wide btn-action booking-cancel"><i class="fa fa-trash-o 2x"></i> Cancel</a>
+                                    </td>
+                                    <td>
+                                        <span th:each="payment : ${booking.payments}" th:if="${payment.status.toString() != 'CANCELED'}">
+                                            <span  th:text="${'$' + payment.paymentAmount + ' ' + payment.currency}"></span>
+                                            <span th:if="${payment.status.toString() == 'SUCCESS'}" class="label label-default">Paid</span>
+                                            <br>
+                                        </span>
+                                        <a th:if="${booking.isEditable() && !booking.isPaid()}" th:href="${'/user/booking/' + booking.id + '/updatePayment'}" href="/user/booking/123/updatePayment" class="btn btn-xs btn-default btn-raised btn-action booking-update-payment"><i class="fa fa-pencil-square-o 2x"></i> Update</a>
+                                        <a th:if="${booking.isEditable() && !booking.isPaid() && booking.isFinalDepositPaymentAvailable()}" th:href="${'/user/booking/' + booking.id + '/processFinalDepositPayment'}" href="/user/booking/123/processFinalDepositPayment" class="btn btn-xs btn-default btn-raised btn-action booking-update-payment"><i class="fa fa-check-square-o 2x"></i> Finalise payment</a>
+                                    </td>
+                                    <td th:text="${booking.processStatus.name()}">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

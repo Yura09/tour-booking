@@ -1,0 +1,53 @@
+
+# Project files
+*.iml
+.idea
+.project
+.settings
+.classpath
+.gradletasknamecache
+.factorypath
+
+.gradle
+build/
+bin
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+secrets.yml
+secrets.env
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+!src/main/environment/start.jar
+
+# Java files
+*.class
+*.war
+*.ear
+target
+
+# Mac OS X Finder
+.DS_Store
+
+# Other source repository archive directories (protects when importing)
+.hg
+.svn
+CVS
+
+# automatic backup files
+*~.nib
+*.swp
+*.log
+*~
+*(Autosaved).rtfd/
+Backup[ ]of[ ]*.pages/
+Backup[ ]of[ ]*.key/
+Backup[ ]of[ ]*.numbers/
+~$*
+_*
+
+# Vagrant template
+.vagrant/
+.directory

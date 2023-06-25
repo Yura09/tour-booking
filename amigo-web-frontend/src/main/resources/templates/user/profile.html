@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:wro4j="http://www.w3.org/1999/xhtml"
+      layout:decorator="layouts/main">
+<body>
+<div layout:fragment="content">
+    <!--/*@thymesVar id="success" type="java.lang.String"*/-->
+    <!--/*@thymesVar id="error" type="java.lang.String"*/-->
+    <!--/*@thymesVar id="user" type="com.touramigo.security.UserInfoModel"*/-->
+    <!--/*@thymesVar id="titles" type="java.util.HashMap<java.lang.String,java.lang.String>"*/-->
+    <!--/*@thymesVar id="nationalities" type="java.util.HashMap<java.lang.String,java.lang.String>"*/-->
+    <!--/*@thymesVar id="countries" type="java.util.HashMap<java.lang.String,java.lang.String>"*/-->
+    <div class="container info-container">
+        <div class="row">
+            <th:block th:if="${success}">
+                <div th:replace="fragments/validation/alert :: alert (type='success', message=${success}, errors=null)">
+                    Alert
+                </div>
+            </th:block>
+            <th:block th:if="${error}">
+                <div th:replace="fragments/validation/alert :: alert (type='danger', message=${error}, errors=null)">
+                    Alert
+                </div>
+            </th:block>
+            <div class="col-sm-12 col-md-offset-2 col-md-8 info-card">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h1>User profile</h1>
+                        <div th:replace="user/profileTabs :: profileTabs ('profile')"></div>
+                    </div>
+                </div>
+
+                <div id="userData">
+                    <div class="row">
+                        <div class="col-sm-4 text-primary">
+                            Name:
+                        </div>
+                        <div class="col-sm-8" id="firstNameText">
+                            [[${user.fullName}]]
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 text-primary">
+                            Email:
+                        </div>
+                        <div class="col-sm-8" id="emailAddressText" th:text="${user.email}">
+                            test@test.pl
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 text-primary">
+                            Mobile:
+                        </div>
+                        <div class="col-sm-8" id="mobilePhoneText" th:text="${user.contactNumber}">
+                            123123123
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="custom-script">
+    /*<![CDATA[*/
+    $(function () {
+        $('#initEditPersonalInfo').on('click', function () {
+            $('#userDataEdit').show();
+            $('#userData').hide();
+        });
+
+        $('#initChangePassword').on('click', function () {
+            $('#passwordEdit').show();
+            $('#userData').hide();
+        });
+
+        $('.cancel-button').on('click', function () {
+            $('#userDataEdit').hide();
+            $('#passwordEdit').hide();
+            $('#userData').show();
+        });
+
+        var userDataForm = $('#userDataForm');
+        userDataForm.parsley({});
+        userDataForm.find('#title').selectize({});
+        userDataForm.find('#nationality').selectize({});
+        userDataForm.find('#country').selectize({});
+        var datePickerConfig = {
+            autoclose: true,
+            startView: 2,
+            format: 'dd-mm-yyyy'
+        };
+        userDataForm.find('#dateOfBirth').datepicker(datePickerConfig);
+        userDataForm.find('#issueDate').datepicker(datePickerConfig);
+        userDataForm.find('#expiryDate').datepicker(datePickerConfig);
+        var editPasswordForm = $('#editPasswordForm');
+        editPasswordForm.parsley({});
+
+        editPasswordForm.find('#password').on('keyup', function () {
+            var providedPassword = $(this).val();
+            var passwordStrengthIndicator = editPasswordForm.find('#passwordStrengthIndicator');
+            var passwordSubmitButton = editPasswordForm.find('.password-submit');
+            checkPasswordStrength(providedPassword, passwordStrengthIndicator, passwordSubmitButton);
+        });
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

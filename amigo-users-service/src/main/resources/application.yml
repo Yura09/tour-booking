@@ -1,0 +1,6 @@
+logging:
+  level:
+    org.springframework.cloud.config.client.ConfigServicePropertySourceLocator: warn
+flyway:
+  outOfOrder: true
+

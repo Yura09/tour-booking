@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:wro4j="http://www.w3.org/1999/xhtml"
+      layout:decorator="layouts/main">
+
+<object layout:fragment="meta">
+    <meta name="title" content="Sign up | Tour Amigo">
+    <meta  name="description" content="Sign up to Tour Amigo and start searching for tours, flights and travel insurance.">
+</object>
+
+<body>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<div layout:fragment="content">
+    <!--/*@thymesVar id="modal" type="java.lang.Boolean"*/-->
+    <!--/*@thymesVar id="error" type="java.lang.String"*/-->
+    <!--/*@thymesVar id="registerUser" type="com.touramigo.user.RegisterUser"*/-->
+    <div class="container info-container" th:fragment="signup(modal)">
+        <div class="row">
+            <th:block th:if="${error}">
+                <div th:replace="fragments/validation/alert :: alert (type='danger', message=${error}, errors=null)">
+                    Alert
+                </div>
+            </th:block>
+            <div class="login-modal">
+                <button th:if="${modal}" type="button" class="close" data-dismiss="modal">&times;</button>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h3>Hi Amigo</h3>
+                        <p>Sign up to Tour Amigo to compare and book the best value package tours from over 160 destinations worldwide.</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <form id="signupForm" class="form-vertical" method="POST">
+                        <fieldset>
+                            <div class="col-sm-12 form-group">
+                                <label class="control-label"  for="firstName">First name *</label>
+                                <input id="firstName" name="firstName" type="text" th:value="${registerUser != null ? registerUser.firstName : ''}" class="form-control" required="required" autofocus="autofocus">
+                            </div>
+
+                            <div class="col-sm-12 form-group">
+                                <label class="control-label" for="email">Email address *</label>
+                                <input autocomplete="off" id="email" name="email" type="email" th:value="${registerUser != null ? registerUser.email : ''}" class="form-control" required="required">
+                                <span id="uniqueIndicator" class="pull-right field-indicator"></span>
+                            </div>
+
+                            <div class="col-sm-12 form-group">
+                                <label class="control-label" for="password">Password *</label>
+                                <input type="password" name="password" id="password_fake" class="hidden" autocomplete="off" style="display: none;" disabled="disabled">
+                                <input autocomplete="new-password" id="password" name="password" type="password" class="form-control" required="required"/>
+                                <span id="passwordStrengthIndicator" class="pull-right field-indicator"></span>
+                            </div>
+
+                            <input id="referredBy" name="referredBy" type="hidden" value="" class="form-control" autocomplete="off">
+
+                            <div class="col-sm-12 form-group">
+                                <div class="g-recaptcha" data-sitekey="6LdZtKgUAAAAAAHVFz5fqifeYuQdlsJDTtnqy2_U"></div>
+                            </div>
+
+                            <div class="col-sm-12 form-group">
+                                <button id="signUpButton" class="btn btn-primary btn-raised btn-wide password-submit" type="submit">
+                                    Sign up
+                                </button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <a id="switchToLogin" href="/login">Log in</a> <span>if you already have an account</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script layout:fragment="custom-script">
+    /*<![CDATA[*/
+    $(function () {
+
+
+        var signupPanel = $('#mainPanel');
+        signupPanel.find('#signupForm').parsley({});
+
+        signupPanel.find('#password').on('keyup', function () {
+            var providedPassword =  $(this).val();
+            var passwordStrengthIndicator = signupPanel.find('#passwordStrengthIndicator');
+            var passwordSubmitButton = signupPanel.find('.password-submit');
+            checkPasswordStrength(providedPassword, passwordStrengthIndicator, passwordSubmitButton);
+        });
+
+        signupPanel.find('#email').on('blur', function () {
+            var signUpButton = signupPanel.find('#signUpButton');
+            if ($(this).val()) {
+                $.get({
+                    url: '/emailVerify',
+                    data: { email: $(this).val() },
+                    error: function () {
+                        signUpButton.attr('disabled', false);
+                    },
+                    success: function (res) {
+                        var uniqueIndicator = signupPanel.find('#uniqueIndicator');
+                        if (res && res.isUnique) {
+                            uniqueIndicator.text('Unique');
+                            uniqueIndicator.css('color', 'green');
+                            signUpButton.attr('disabled', false);
+                        } else {
+                            uniqueIndicator.text('There is already an account with this email');
+                            uniqueIndicator.css('color', 'red');
+                            signUpButton.attr('disabled', true);
+                        }
+                    }
+                });
+            } else {
+                signUpButton.attr('disabled', false);
+            }
+        });
+
+        // Initialize referral
+        var REFERRAL_CODE_STORE = 'referral_code_store';
+        var referralCode = store(REFERRAL_CODE_STORE);
+        if (referralCode) {
+            signupPanel.find('#referredBy').val(referralCode);
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

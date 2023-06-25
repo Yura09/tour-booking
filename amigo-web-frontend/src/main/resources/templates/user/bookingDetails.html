@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/main">
+<body>
+<div layout:fragment="content">
+    <!--/*@thymesVar id="booking" type="com.touramigo.booking.Booking"*/-->
+    <div class="container info-container">
+        <div class="row">
+            <div class="col-sm-12 col-md-offset-2 col-md-8">
+                <a href="/user/booking" class="btn btn-default btn-raised btn-top"><i class="fa fa-angle-left"></i> Back</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-offset-2 col-md-8 info-card">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h1>User bookings - booking details</h1>
+                        <div th:replace="user/profileTabs :: profileTabs ('booking')"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div th:replace="booking/bookingInformation :: information (${booking}, true)">
+                            Booking information
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/main">
+<body>
+<div layout:fragment="content">
+    <!--/*@thymesVar id="booking" type="com.touramigo.booking.Booking"*/-->
+    <!--/*@thymesVar id="stripeKey" type="java.lang.String"*/-->
+    <div class="container info-container">
+        <div class="row">
+            <div class="col-sm-12 col-md-offset-2 col-md-8">
+                <a href="/user/booking" class="btn btn-default btn-raised btn-top"><i class="fa fa-angle-left"></i> Back</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-offset-2 col-md-8 info-card">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h1>User bookings - payment</h1>
+                        <div th:replace="user/profileTabs :: profileTabs ('booking')"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div th:replace="booking/bookingInformation :: information (${booking}, true)">
+                            Booking information
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 booking-details">
+                        <h2>Update payment details for the tour</h2>
+                        <div class="row text-center">
+                            <div class="col-xs-12">
+                                <form method="post" id="paymentForm">
+                                    <input type="hidden" name="currency" th:value="${booking.currency}" />
+                                    <input type="hidden" name="paymentType" th:value="${booking.paymentType}">
+                                    <input type="hidden" name="tourOperatorTermsAccepted" value="true">
+                                    <input type="hidden" name="tourAmigoTermsAccepted" value="true">
+                                    <button id="payWithStripe" class="btn btn-primary btn-raised btn-wide" type="button">Update payment</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="custom-script">
+    /*<![CDATA[*/
+    $(function () {
+        var payWithStripeButton = $('#payWithStripe');
+
+        payWithStripeButton.on('click', function(){
+            StripeCheckout.open({
+                key: '[[${stripeKey}]]',
+                currency: '[[${booking.currency}]]',
+                name: 'Touramigo',
+                image: '/apple-icon-144x144.png',
+                email: '[[${#authentication.principal.emailAddress}]]',
+                allowRememberMe: false,
+                locale: 'auto',
+                panelLabel: 'Update',
+                token: function(response){
+                    payWithStripeButton.attr('disabled', true);
+                    var $id = $('<input type=hidden name=stripeToken />').val(response.id);
+                    var $email = $('<input type=hidden name=stripeEmail />').val(response.email);
+                    $('#paymentForm').append($id).append($email).submit();
+                }
+            });
+
+            return false;
+        });
+    });
+    /*]]>*/
+</script>
+
+</body>
+</html>

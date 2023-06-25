@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.w3.org/1999/xhtml"
+      layout:decorator="layouts/main">
+
+<object layout:fragment="meta">
+    <meta name="title" content="Login | Tour Amigo">
+    <meta  name="description" content="Login to Tour Amigo and start searching for tours, flights and travel insurance.">
+</object>
+
+<body>
+<div layout:fragment="content">
+    <!--/*@thymesVar id="modal" type="java.lang.Boolean"*/-->
+    <!--/*@thymesVar id="success" type="java.lang.String"*/-->
+    <!--/*@thymesVar id="error" type="java.lang.String"*/-->
+    <div class="container info-container" th:fragment="login(modal)">
+        <div class="row">
+            <th:block th:if="${success}">
+                <div th:replace="fragments/validation/alert :: alert (type='success', message=${success}, errors=null)">
+                    Alert
+                </div>
+            </th:block>
+            <th:block th:if="${error}">
+                <div th:replace="fragments/validation/alert :: alert (type='danger', message=${error}, errors=null)">
+                    Alert
+                </div>
+            </th:block>
+            <div sec:authorize="!isAuthenticated()" class="login-modal">
+                <button th:if="${modal}" type="button" class="close" data-dismiss="modal">&times;</button>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h3>Welcome back Amigo</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <form id="loginForm" class="form-vertical" name="f" action="/perform_login" method="POST" data-parsley-trigger="keyup">
+                        <fieldset>
+                            <div class="col-sm-12 form-group">
+                                <label class="control-label" for="username">Email address *</label>
+                                <input type="email" id="username" name="username" class="form-control" required="required" autofocus>
+                            </div>
+                            <div class="col-sm-12 form-group">
+                                <label class="control-label" for="password">Password *</label>
+                                <input type="password" id="password" name="password" class="form-control" required="required">
+                            </div>
+                            <div class="col-sm-12">
+                                <button id="loginButton" class="btn btn-lg btn-primary btn-raised btn-wide" type="submit">Log in</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <div class="col-sm-12 form-group is-empty">
+                        <a href="/forgot-password">Forgot password?</a></div>
+                </div>
+
+            </div>
+
+            <div sec:authorize="isAuthenticated()" class="col-sm-12 col-md-offset-3 col-md-6 info-card">
+                <button th:if="${modal}" type="button" class="close" data-dismiss="modal">&times;</button>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h3>You are already signed in</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div calss="col-sm-12">
+                        You are already signed in as <span th:text="${#authentication.name}"></span>. If you want to login as a different person please logout first by clicking button below.
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <form action="/perform_logout" method="POST">
+
+                            <button class="btn btn-primary btn-raised" onclick="localStorage.clear()">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="custom-script">
+    /*<![CDATA[*/
+    $(function () {
+        var loginForm = $('#mainPanel').find('#loginForm');
+        if (loginForm.length) {
+            loginForm.parsley({});
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

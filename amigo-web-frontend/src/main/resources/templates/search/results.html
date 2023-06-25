@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/main">
+<body>
+
+<title layout:fragment="title">Search Tours &amp; Search Tour Packages</title>
+<object layout:fragment="meta">
+    <meta name="title" content="Search Tours - Search Tour Packages | Tour Amigo">
+    <meta name="description"
+          content="Search tours and tour packages online with Tour Amigo. Search and book tours today.">
+    <link rel="canonical" href="https://touramigo.com/">
+</object>
+
+<div layout:fragment="content">
+    <!--/*@thymesVar id="tours" type="com.touramigo.tour.PagedResult<com.touramigo.tour.SearchResult>"*/-->
+    <!--/*@thymesVar id="departureMonths" type="java.util.HashMap<java.lang.String,java.lang.String>"*/-->
+    <!--/*@thymesVar id="numberGuests" type="java.util.HashMap<java.lang.Integer,java.lang.String>"*/-->
+    <!--/*@thymesVar id="ageRanges" type="java.util.HashMap<java.lang.String,java.lang.String>"*/-->
+    <!--/*@thymesVar id="sortOptions" type="java.util.HashMap<java.lang.String,java.lang.String>"*/-->
+    <!--/*@thymesVar id="tourOperators" type="java.util.List<com.touramigo.service.tourdata.client.entity.TourOperator>" */-->
+    <!--/*@thymesVar id="searchModel" type="com.touramigo.tour.TourSearchModel"*/-->
+    <!--/*@thymesVar id="deviceType" type="java.lang.String"*/-->
+    <!--/*@thymesVar id="destinationKeyWords" type="java.util.HashMap<java.lang.String,java.util.HashMap<java.lang.String,java.lang.String>>"*/-->
+    <!--/*@thymesVar id="accommodations" type="java.util.HashMap<java.lang.String,java.lang.String>"*/-->
+    <!--/*@thymesVar id="moreCategories" type="java.util.HashMap<java.lang.String,java.lang.String>"*/-->
+    <!--/*@thymesVar id="groupSizes" type="java.util.HashMap<java.lang.String,java.lang.String>"*/-->
+    <div class="search-results-container">
+        <form id="search-form" action="/search-tours">
+            <fieldset>
+                <div class="hidden-md hidden-lg apply-button-spacer moreItems">
+                    <div class="apply-button-container">
+                        <button type="submit" class="btn btn-primary btn-raised btn-wide">Apply</button>
+                    </div>
+                </div>
+                <div class="search-results-header">
+                    <div class="container search-results-header-container">
+                        <h1 th:text="|Showing ${tours.totalElements} Tours For|">Showing 12 Tours For</h1>
+                        <div id="whereToFormGroup">
+                            <select id="whereTo" class="form-control no-full-borders" name="whereTo"
+                                    multiple="multiple" size="8">
+                                <option th:each="whereToOption: ${searchModel.whereTo}"
+                                        th:value="${whereToOption}" th:text="${whereToOption}"
+                                        selected="selected" value="Asia">Asia
+                                </option>
+                            </select>
+                        </div>
+                        <div class="hidden-md hidden-lg text-center lessItems">
+                            <a id="moreSearchOptions" class="btn btn-default btn-raised">Show all search options</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row moreItems">
+                        <div class="col-sm-12 col-md-offset-8 col-md-4">
+                            <label class="control-label sort-by-label">SORT BY:</label>
+                            <div id="sortByFormGroup">
+                                <select id="sortBy" class="form-control" name="sortBy">
+                                    <option th:each="sortOption: ${sortOptions}"
+                                            th:value="${sortOption.key}"
+                                            th:text="${sortOption.value}"
+                                            th:selected="${sortOption.key == searchModel.sortBy}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="filterFormGroup" class="col-md-3 moreItems">
+                            <div class="row">
+                                <div class="col-md-12 filter-container">
+                                    <div class="filter-content">
+                                        <h4>Dates</h4>
+
+                                        <div id="departureMonthFormGroup">
+                                            <select id="departureMonth" class="form-control" name="departureMonth">
+                                                <option th:each="departureMonth: ${departureMonths}"
+                                                        th:value="${departureMonth.key}"
+                                                        th:text="${departureMonth.value}"
+                                                        th:selected="${departureMonth.key == searchModel.departureMonth}"></option>
+                                            </select>
+                                        </div>
+
+
+                                        <div class="form-group days-number">
+                                            <input id="minDaysDisplay" name="minDaysDisplay"
+                                                   th:value="${searchModel.minDaysDisplay}" type="text"
+                                                   onclick="this.setSelectionRange(0, this.value.length)"
+                                                   class="form-control" value="1 Day"
+                                                   autocomplete="off">
+                                            <input id="minDays" name="minDays" type="hidden"
+                                                   th:value="${searchModel.minDays}"
+                                                   autocomplete="off">
+                                            <span class="control-label">to</span>
+                                            <input id="maxDaysDisplay" name="maxDaysDisplay"
+                                                   th:value="${searchModel.maxDaysDisplay}" type="text"
+                                                   onclick="this.setSelectionRange(0, this.value.length)"
+                                                   class="form-control" value="21 Days"
+                                                   autocomplete="off">
+                                            <input id="maxDays" name="maxDays" type="hidden"
+                                                   th:value="${searchModel.maxDays}"
+                                                   autocomplete="off">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 filter-container">
+                                    <div class="filter-content">
+                                        <h4>Travellers</h4>
+                                        <div id="numberGuestsFormGroup">
+                                            <select id="numberGuests" class="form-control" name="numberPax">
+                                                <option th:each="guestNumber: ${numberGuests}"
+                                                        th:value="${guestNumber.key}"
+                                                        th:text="${guestNumber.value}"
+                                                        th:selected="${guestNumber.key.toString() == searchModel.numberPax}"></option>
+                                            </select>
+                                        </div>
+
+                                        <div id="ageRangeFormGroup">
+                                            <select id="ageRange" class="form-control" name="ageRange">
+                                                <option th:each="ageRange: ${ageRanges}" th:value="${ageRange.key}"
+                                                        th:text="${ageRange.value}"
+                                                        th:selected="${ageRange.key == searchModel.ageRange}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 filter-container">
+                                    <div class="filter-content">
+                                        <h4>Tour Type</h4>
+
+                                        <div class="theme-style-container">
+                                            <div class="theme-style">
+                                                <div class="theme-style-border left">
+                                                    <img class="theme-style-land"
+                                                         th:classappend="${searchModel.themeCategory.contains('land') ? 'theme-selected' : ''}"
+                                                         alt=""
+                                                         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQAQMAAAC032DuAAAAA1BMVEX///+nxBvIAAAAAXRSTlMAQObYZgAAABFJREFUeNpjYBgFo2AU0AsAAANwAAFHM3wcAAAAAElFTkSuQmCC">
+                                                    <div class="checkbox form-group">
+                                                        <label id="tourStyleCityLabel">
+                                                            <span>City</span>
+                                                            <input name="themeCategory" value="land"
+                                                                   th:checked="${searchModel.themeCategory.contains('land')}"
+                                                                   id="tourStyleCity" type="checkbox"
+                                                                   class="theme-category-checkbox">
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="theme-style">
+                                                <div class="theme-style-border right">
+                                                    <img class="theme-style-festival"
+                                                         th:classappend="${searchModel.themeCategory.contains('festival') ? 'theme-selected' : ''}"
+                                                         alt=""
+                                                         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQAQMAAAC032DuAAAAA1BMVEX///+nxBvIAAAAAXRSTlMAQObYZgAAABFJREFUeNpjYBgFo2AU0AsAAANwAAFHM3wcAAAAAElFTkSuQmCC">
+                                                    <div class="checkbox form-group">
+                                                        <label id="tourStyleFestivalLabel">
+                                                            <span>Festive</span>
+                                                            <input name="themeCategory" value="festival"
+                                                                   th:checked="${searchModel.themeCategory.contains('festival')}"
+                                                                   id="tourStyleFestival" type="checkbox"
+                                                                   class="theme-category-checkbox">
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="theme-style">
+                                                <div class="theme-style-border left">
+                                                    <img class="theme-style-nature"
+                                                         th:classappend="${searchModel.themeCategory.contains('nature') ? 'theme-selected' : ''}"
+                                                         alt=""
+                                                         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQAQMAAAC032DuAAAAA1BMVEX///+nxBvIAAAAAXRSTlMAQObYZgAAABFJREFUeNpjYBgFo2AU0AsAAANwAAFHM3wcAAAAAElFTkSuQmCC">
+                                                    <div class="checkbox form-group">
+                                                        <label id="tourStyleNatureLabel">
+                                                            <span>Nature</span>
+                                                            <input name="themeCategory" value="nature"
+                                                                   th:checked="${searchModel.themeCategory.contains('nature')}"
+                                                                   id="tourStyleNature" type="checkbox"
+                                                                   class="theme-category-checkbox">
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="theme-style">
+                                                <div class="theme-style-border right">
+                                                    <img class="theme-style-marine"
+                                                         th:classappend="${searchModel.themeCategory.contains('marine') ? 'theme-selected' : ''}"
+                                                         alt=""
+                                                         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQAQMAAAC032DuAAAAA1BMVEX///+nxBvIAAAAAXRSTlMAQObYZgAAABFJREFUeNpjYBgFo2AU0AsAAANwAAFHM3wcAAAAAElFTkSuQmCC">
+                                                    <div class="checkbox form-group">
+                                                        <label id="tourStyleMarineLabel">
+                                                            <span>Water</span>
+                                                            <input name="themeCategory" value="marine"
+                                                                   th:checked="${searchModel.themeCategory.contains('marine')}"
+                                                                   id="tourStyleMarine" type="checkbox"
+                                                                   class="theme-category-checkbox">
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="moreCategoriesFormGroup" class="form-group">
+                                            <select class="form-control refine-input" name="moreCategories"
+                                                    id="moreCategories">
+                                                <option th:each="category: ${moreCategories}"
+                                                        th:value="${category.key}"
+                                                        th:text="${category.value}"
+                                                        th:selected="${category.key == searchModel.moreCategories}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 filter-container">
+                                    <div class="filter-content">
+                                        <h4>Price Range</h4>
+                                        <div class="form-group">
+                                            <input type="hidden" class="form-control text-right refine-input"
+                                                   name="priceMin" id="priceMin" th:value="${searchModel.priceMin}"
+                                                   value="1">
+                                            <input type="hidden" class="form-control text-right refine-input"
+                                                   name="priceMax" id="priceMax" th:value="${searchModel.priceMax}"
+                                                   value="100000">
+                                            $<span id="priceMinText"
+                                                   th:text="${#numbers.formatDecimal(searchModel.priceMin, 0, 'COMMA', 2, 'POINT')}">0</span>
+                                            <small>AUD</small> -
+                                            $<span id="priceMaxText"
+                                                   th:text="${#numbers.formatDecimal(searchModel.priceMax, 0, 'COMMA', 2, 'POINT')}">100,000</span>
+                                            <small>AUD</small>
+                                        </div>
+                                        <div id="priceSlider"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-12 filter-container">
+                                    <div class="filter-content">
+                                        <h4>Other</h4>
+                                        <div id="startCityFormGroup" class="form-group">
+                                            <select type="text" class="form-control refine-input" name="startCity"
+                                                    id="startCity" placeholder="Starting in?">
+                                                <option th:if="${searchModel.startCity != null && !searchModel.startCity.empty}"
+                                                        th:value="${searchModel.startCity}"
+                                                        th:text="${searchModel.startCity}"
+                                                        selected="selected" value="London">London
+                                                </option>
+                                            </select>
+                                            <i id="startsCitySpinner"
+                                               class="fa fa-spinner fa-spin fa-3x fa-fw city-spinner"
+                                               style="display: none;"></i>
+                                        </div>
+                                        <div id="finishCityFormGroup" class="form-group">
+                                            <select type="text" class="form-control refine-input" name="endCity"
+                                                    id="endCity" placeholder="Finishing in?">
+                                                <option th:if="${searchModel.endCity != null && !searchModel.endCity.empty}"
+                                                        th:value="${searchModel.endCity}"
+                                                        th:text="${searchModel.endCity}"
+                                                        selected="selected" value="London">London
+                                                </option>
+                                            </select>
+                                            <i id="finishCitySpinner"
+                                               class="fa fa-spinner fa-spin fa-3x fa-fw city-spinner"
+                                               style="display: none;"></i>
+                                        </div>
+
+                                        <div id="accommodationFormGroup" class="form-group">
+                                            <select class="form-control refine-input" name="accommodation"
+                                                    id="accommodation">
+                                                <option th:each="accommodation: ${accommodations}"
+                                                        th:value="${accommodation.key}"
+                                                        th:text="${accommodation.value}"
+                                                        th:selected="${accommodation.key == searchModel.accommodation}"></option>
+                                            </select>
+                                        </div>
+                                        <div id="specifiedDestinationFormGroup" class="form-group">
+                                            <div class="checkbox form-group">
+                                                <label>
+                                                    <span>Only specified destinations</span>
+                                                    <input name="specifiedDestination"
+                                                           th:checked="${searchModel.specifiedDestination}"
+                                                           type="checkbox" class="theme-category-checkbox">
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-md-12 filter-container">
+                                    <div class="filter-content" th:if="${tourOperators.size() <= 1}">
+                                        No suppliers assigned
+                                    </div>
+                                    <div class="filter-content" th:if="${tourOperators.size() > 1}">
+                                        <h4>Tour Operators</h4>
+                                        <div class="checkbox form-group tour-operator-form-group"
+                                             th:if="${tourOperator.active}"
+                                             th:classappend="${(searchModel.tourOperator.contains('ALL') && tourOperator.code != 'ALL') || (!searchModel.tourOperator.contains('ALL') && tourOperator.code == 'ALL')} ? 'not-active-option' : ''"
+                                             th:each="tourOperator:${tourOperators}">
+                                            <label th:for="${'tourOperator' + tourOperator.code}">
+                                                <input name="tourOperator" th:value="${tourOperator.code}" th:checked="${searchModel.tourOperator.contains(tourOperator.code)}" th:id="${'tourOperator' + tourOperator.code}" type="checkbox" class="tour-operator-checkbox">
+                                                <span class="tour-operator-name" th:text="${tourOperator.name}"></span>
+                                                <img th:if="${tourOperator.logoURL}" class="tour-operator-filter-image" th:src="${tourOperator.logoURL}">
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-9 results-list lessItems">
+                            <!----------------------------- No results ------------------------------------>
+                            <div th:if="${tours.content.size() == 0}" id="noResults" class="search-results-empty">
+                                <div th:if="${tours.totalElements == 0}" class="results-empty-container">
+                                    <p class="text-primary">No Results - <span th:text="${tourOperators.size() > 1 ? 'coming soon' : 'no suppliers assigned'}"></span></p>
+
+                                    <a id="searchAgain" href="/" class="btn btn-primary btn-raised btn-third">Search Again</a>
+
+                                    <p class="smaller">Our tip: try a less specific search, or search for other departure dates.</p>
+                                </div>
+                                <div th:if="${tours.totalElements > 0}" class="results-empty-container">
+                                    <p class="text-primary">
+                                        Due to the high load, the server could not process your request in time.
+                                        <br/>
+                                        We decided to cancel it so you don't have to wait in vain.
+                                    </p>
+                                    <p class="smaller">
+                                        Our tip: try a little bit more specific search.
+                                        <br/>
+                                        For example, look through tours of any one particular operator.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!----------------------------- Result list ------------------------------------>
+                            <div th:each="tour: ${tours.content}">
+                                <div th:replace="search/compareContent :: compareContent(${tour})"></div>
+                            </div>
+                            <div>
+                                <ul class="pager">
+                                    <li th:if="${searchModel.pageNumber > 0}"><a href="/search-tours" th:href="${#httpServletRequest.requestURI + '?' + searchModel.currentQuery +'&pageNumber=' + (searchModel.pageNumber - 1)} " id="previousPage">Previous</a>
+                                    <li th:if="${tours.totalPages > 1 && !tours.last}"><a href="/search-tours" th:href="${#httpServletRequest.requestURI + '?' + searchModel.currentQuery +'&pageNumber=' + (searchModel.pageNumber + 1)}" id="nextPage">Next</a></li>
+                                </ul>
+                                <input type="hidden" name="pageNumber" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+    <div th:replace="discount/newsletterSignup :: newsletterSignup">
+    </div>
+
+</div>
+
+<script layout:fragment="custom-script">
+    /*<![CDATA[*/
+    $(function () {
+        function appendDays(value) {
+            var daysExpresion = ' Days';
+            if (value === 1) {
+                daysExpresion = ' Day';
+            }
+
+            return value + daysExpresion;
+        }
+
+        function isNumeric(checkedValue) {
+            return !isNaN(parseFloat(checkedValue)) && isFinite(checkedValue)
+        }
+
+        function detailsToggle(tourId) {
+            console.log(tourId);
+        }
+
+        // Page selectors
+        var searchForm = $('#search-form');
+        var whereTo = $('#whereTo');
+        var departureMonth = $('#departureMonth');
+        var ageRange = $('#ageRange');
+        var numberGuests = $('#numberGuests');
+        var sortBy = $('#sortBy');
+        var minDays = $('#minDays');
+        var minDaysDisplay = $('#minDaysDisplay');
+        var maxDays = $('#maxDays');
+        var maxDaysDisplay = $('#maxDaysDisplay');
+        var moreCategories = $('#moreCategories');
+        var accommodation = $('#accommodation');
+        var moreSearchOptionsButton = $('#moreSearchOptions');
+        var isMobileView = moreSearchOptionsButton.is(':visible');
+        var moreItems = $('.moreItems');
+        var lessItems = $('.lessItems');
+        store('history_search', searchForm.context.URL);
+        // Hide more options panel
+        if (isMobileView) {
+            moreItems.hide();
+        }
+
+        moreSearchOptionsButton.on('click', function () {
+            moreItems.toggle();
+            lessItems.toggle();
+        });
+
+        // Initialize selectize for search multi-select drop downs
+        whereTo.selectize({
+            plugins: ['remove_button'],
+            hideSelected: true,
+            placeholder: 'Where to',
+            delimiter: ',',
+            openOnFocus: false,
+            selectOnTab: true,
+            closeAfterSelect: true,
+            valueField: 'name',
+            labelField: 'name',
+            searchField: 'name',
+            preload: true,
+            load: function (query, callback) {
+                $.ajax({
+                    url: '/search-tours/destinations.json?destinationFilter=' + query,
+                    type: 'GET',
+                    error: function () {
+                        callback();
+                    },
+                    success: function (res) {
+                        callback(res);
+                    }
+                });
+            },
+            onChange: function () {
+                if (!isMobileView || moreSearchOptionsButton.is(':visible')) {
+                    searchForm.submit();
+                }
+            }
+        });
+
+        var defaultConfig = {
+            onChange: function () {
+                if (!isMobileView) {
+                    searchForm.submit();
+                }
+            }
+        };
+        departureMonth.selectize(defaultConfig);
+        ageRange.selectize(defaultConfig);
+        numberGuests.selectize(defaultConfig);
+        sortBy.selectize(defaultConfig);
+        moreCategories.selectize(defaultConfig);
+        accommodation.selectize(defaultConfig);
+
+        departureMonth.on('change', function () {
+            createCookie('lastSearchedMonth', departureMonth.val());
+        });
+
+        minDaysDisplay.keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                this.blur();
+            }
+        });
+
+        maxDaysDisplay.keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                this.blur();
+            }
+        });
+
+        var minDaysCurrentValue = minDays.val();
+        minDaysDisplay.on('blur', function () {
+            var newValue = parseInt(minDaysDisplay.val().replace(/\D/g, ""));
+            if (isNumeric(newValue)) {
+                if (newValue >= maxDays.val()) {
+                    newValue = maxDays.val();
+                }
+                minDaysDisplay.val(appendDays(newValue));
+                if (minDaysCurrentValue !== newValue) {
+                    minDays.val(newValue);
+                    if (!isMobileView) {
+                        searchForm.submit();
+                    }
+                }
+            } else {
+                minDaysDisplay.val(appendDays(minDaysCurrentValue));
+            }
+        });
+        var maxDaysCurrentValue = maxDays.val();
+        maxDaysDisplay.on('blur', function () {
+            var newValue = parseInt(maxDaysDisplay.val().replace(/\D/g, ''));
+            if (isNumeric(newValue)) {
+                if (newValue <= minDays.val()) {
+                    newValue = minDays.val();
+                }
+                maxDaysDisplay.val(appendDays(newValue));
+                if (maxDaysCurrentValue !== newValue) {
+                    maxDays.val(newValue);
+                    if (!isMobileView) {
+                        searchForm.submit();
+                    }
+                }
+            } else {
+                maxDaysDisplay.val(appendDays(maxDaysCurrentValue));
+            }
+        });
+
+        // Tour Type
+        var themeCategory = $('.theme-category-checkbox');
+        themeCategory.on('change', function () {
+            var container = $(this).parents('.theme-style-border');
+            var themeImage = container.find('img');
+            themeImage.toggleClass('theme-selected');
+            if (!isMobileView) {
+                searchForm.submit();
+            }
+        });
+
+        // Price slider
+        var priceSlider = $('#priceSlider')[0];
+        var priceMinInput = $('#priceMin');
+        var priceMaxInput = $('#priceMax');
+        var priceMinText = $('#priceMinText');
+        var priceMaxText = $('#priceMaxText');
+        var priceMinValue = priceMinInput.val();
+        var priceMaxValue = priceMaxInput.val();
+
+        noUiSlider.create(priceSlider, {
+            start: [priceMinValue, priceMaxValue],
+            step: 10,
+            behaviour: 'drag',
+            connect: true,
+            range: {
+                'min': 1,
+                '10%': 200,
+                '50%': 1000,
+                '75%': 10000,
+                'max': 100000
+            }
+        });
+
+        priceSlider.noUiSlider.on('update', function (values, handle) {
+            var intValue = parseInt(values[handle]);
+            var textValue = intValue.toFixed(0).replace(/./g, function (c, i, a) {
+                return i && c !== "." && ((a.length - i) % 3 === 0) ? ',' + c : c;
+            });
+            if (handle === 0) {
+                priceMinInput.val(intValue);
+                priceMinText.text(textValue);
+            } else {
+                priceMaxInput.val(intValue);
+                priceMaxText.text(textValue);
+            }
+
+        });
+
+        priceSlider.noUiSlider.on('end', function () {
+            if (!isMobileView) {
+                searchForm.submit();
+            }
+        });
+
+        // Load cities
+        var getCityQueryString = function (type, query) {
+            if (!query.length) {
+                query = '';
+            }
+            var baseQueryString = location.search;
+            if (!baseQueryString) {
+                return '?' + type + '=' + query;
+            } else if (baseQueryString.indexOf(type + '=') !== -1) {
+                var reg = new RegExp('(' + type + '=)[^\\&]*');
+                return baseQueryString.replace(reg, '$1' + query);
+            } else {
+                return baseQueryString + '&' + type + '=' + query;
+            }
+        };
+
+        $('select#startCity').selectize({
+            valueField: 'name',
+            labelField: 'name',
+            searchField: 'name',
+            openOnFocus: true,
+            preload: 'focus',
+            load: function (query, callback) {
+                $('#startsCitySpinner').show();
+                this.settings.load = null;
+                $.ajax({
+                    url: '/search-tours/startCities.json' + getCityQueryString('startCity', query),
+                    type: 'GET',
+                    error: function () {
+                        $('#startsCitySpinner').hide();
+                        callback();
+                    },
+                    success: function (res) {
+                        $('#startsCitySpinner').hide();
+                        callback(res);
+                    }
+                });
+            },
+            onChange: function () {
+                if (!isMobileView) {
+                    searchForm.submit();
+                }
+            }
+        });
+
+        $('select#endCity').selectize({
+            valueField: 'name',
+            labelField: 'name',
+            searchField: 'name',
+            openOnFocus: true,
+            preload: 'focus',
+            load: function (query, callback) {
+                $('#finishCitySpinner').show();
+                this.settings.load = null;
+                $.ajax({
+                    url: '/search-tours/endCities.json' + getCityQueryString('endCity', query),
+                    type: 'GET',
+                    error: function () {
+                        $('#finishCitySpinner').hide();
+                        callback();
+                    },
+                    success: function (res) {
+                        $('#finishCitySpinner').hide();
+                        callback(res);
+                    }
+                });
+            },
+            onChange: function () {
+                if (!isMobileView) {
+                    searchForm.submit();
+                }
+            }
+        });
+
+        // Tour operators
+        var tourOperator = $('.tour-operator-checkbox');
+        tourOperator.on('change', function () {
+            var selectedTourOperator = $(this).val();
+            if (selectedTourOperator === 'ALL' && $(this).prop('checked')) {
+                $(".tour-operator-checkbox[value!='ALL']").prop('checked', false);
+                $(".tour-operator-form-group:first").removeClass('not-active-option');
+                $(".tour-operator-form-group:not(:first)").addClass('not-active-option');
+            } else {
+                $(".tour-operator-checkbox[value='ALL']").prop('checked', false);
+                $(".tour-operator-form-group:first").addClass('not-active-option');
+                $(".tour-operator-form-group:not(:first)").removeClass('not-active-option');
+            }
+            if (!isMobileView) {
+                searchForm.submit();
+            }
+        });
+
+        // Redraw page on orientation change
+        window.addEventListener('orientationchange', function () {
+            var originalBodyStyle = getComputedStyle(document.body).getPropertyValue('display');
+            document.body.style.display = 'none';
+            setTimeout(function () {
+                document.body.style.display = originalBodyStyle;
+                // Hide more options panel
+                if (moreSearchOptionsButton.is(':visible')) {
+                    moreItems.hide();
+                    lessItems.show();
+                } else {
+                    moreItems.show();
+                    lessItems.show();
+                }
+            }, 10);
+        });
+
+        // Click compare tour button if requested
+        var compareTourId = '[[${compareTourId}]]';
+        if (compareTourId) {
+            var comparedTours = store('compare_tour_store');
+            if (!comparedTours || comparedTours.indexOf(compareTourId) == -1) {
+                setTimeout(function () {
+                    $("button[data-tour-id='" + compareTourId + "']").click();
+                }, 2000)
+            }
+        }
+    });
+    /*]]>*/
+</script>
+
+</body>
+</html>

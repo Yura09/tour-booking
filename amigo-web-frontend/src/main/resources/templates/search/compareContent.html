@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+</head>
+<body>
+<!--/*@thymesVar id="searchResult" type="com.touramigo.tour.SearchResult"*/-->
+<!--/*@thymesVar id="globalPromotion" type="java.lang.Integer"*/-->
+    <div th:fragment="compareContent(searchResult)" class="search-result compare-content">
+        <div class="discount" th:if="${searchResult.discount != null && searchResult.discount != 0}">
+            <div class="discount-amount">
+                <span th:text="${'-' + searchResult.discount} + '%'"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <img id="tourImage"
+                     src="/image/missing_tour_image.png"
+                     th:src="${!#strings.isEmpty(searchResult.getResizedImageUrl(deviceType))} ? ${searchResult.getResizedImageUrl(deviceType)} : '/image/missing_tour_image.png'"
+                     th:srcset="${!#strings.isEmpty(searchResult.getResizedImageUrl(deviceType, 2))} ? ${searchResult.getResizedImageUrl(deviceType, 2)} + ' 2x' : '/image/missing_tour_image.png 2x'"
+                     class="lazy tour-image">
+
+                <div th:if="${searchResult.duration != null}" id="numberDaysRes" class="responsive-label"><span
+                        th:text="${searchResult.duration}">2</span> <span
+                        th:text="${searchResult.duration > 1} ? 'days' : 'day'">days</span>
+                </div>
+            </div>
+            <div class="col-md-8 result-details">
+                <div class="tour-title">
+                    <h2><a id="title" th:text="${searchResult.title}" href="/tour" th:href="'/tour/' + ${searchResult.slug} + '?sku=' + ${searchResult.sku} + '&org=' + ${searchResult.tourOperatorCode}">MaiChau Adventure</a></h2>
+                </div>
+                <div class="detail">
+                    <strong th:text="${searchResult.countries.size() > 1 ? searchResult.countries.size() + ' Countries Visited:' : '1 Country Visited:'}">Countries visited: </strong>
+                    <span th:text="${#strings.listJoin(searchResult.countries, ', ')}"
+                          id="countriesVisited">Vietnam</span>
+                </div>
+                <div class="detail">
+                    <strong>Starts: </strong>
+                    <span th:text="${searchResult.startCity}" id="startsIn">Hanoi</span>
+                </div>
+                <div class="detail">
+                    <strong>Finish: </strong>
+                    <span th:text="${searchResult.finishCity}" id="endsIn">Hanoi</span>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 col-lg-7 price-container">
+                        <strong>Price From:</strong>
+                        <span class="price">$<span th:text="${searchResult.price} ? ${searchResult.price.intValue()} : 'NA'">0</span></span>
+                        <small th:text="${searchResult.currency}">USD</small>
+                    </div>
+                    <div class="col-md-4 col-lg-5 operator-logo-container">
+                        <img id="operatorLogo" src="image/world-nomads-logo.png"
+                             th:src="${!#strings.isEmpty(searchResult.tourOperatorLogoUrl)} ? ${searchResult.tourOperatorLogoUrl}" class="operator-logo">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <a id="seeFull" class="btn btn-default btn-wide btn-raised no-padding" href="/tour" th:href="'/tour/' + ${searchResult.slug} + '?sku=' + ${searchResult.sku} + '&org=' + ${searchResult.tourOperatorCode}">View Full Itinerary</a>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <a id="book" class="btn btn-primary btn-wide btn-raised book-tour no-padding" type="button"
+                           th:href="@{'/booking/' + ${searchResult.tourOperatorCode} + '?sku=' + ${searchResult.sku}}">BOOK NOW</a>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <button id="compare" class="btn btn-info btn-wide btn-raised compare-tour no-padding" th:data-tour-id="${searchResult.id}" type="button">Compare tour
+                        </button>
+                        <a class="btn btn-info btn-wide btn-raised compare-backpack no-padding"
+                           href="/compare-your-tours" type="button" style="display: none;">Go To Backpack</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

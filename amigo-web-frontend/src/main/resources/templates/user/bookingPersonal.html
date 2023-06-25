@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+</head>
+<body>
+<!--/*@thymesVar id="passenger" type="com.touramigo.booking.Passenger"*/-->
+<div th:fragment="personal (passenger)">
+    <div class="booking-details">
+        <div class="row">
+            <div class="col-xs-4">First &amp; Last Name</div>
+            <div class="col-xs-8" id="firstAndLastName" th:text="${passenger.fullName}">Jhone
+                dear</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4">Email</div>
+            <div class="col-xs-8" id="email" th:text="${passenger.email}">Jhonedear@gmail.com</div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4">Phone</div>
+            <div class="col-xs-8" id="mobile" th:text="${passenger.phoneNumber}">9876543210</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+</head>
+<body>
+<!--/*@thymesVar id="tour" type="com.touramigo.tour.TourDetails"*/-->
+<!--/*@thymesVar id="supplier" type="com.touramigo.partner.SupplierModel"*/-->
+
+    <div id="tourSideInfo" th:fragment="tourSideInfo(tour)">
+    <!--------- Tour side info --------->
+        <div class="price-container price-discount">
+            Price From: <span class="price">$<span class="base-price-value" th:text="(${tour.price} ? ${tour.price.intValue()} : 'NA')">0</span></span> <small th:text="${tour.currency}">AUD</small>
+            <span class="old-price" th:style="${tour.discount != null && tour.discount != 0} ? 'display:block' : 'display:none'">
+                <br>
+                <span class="price-off-text" th:text="${'-' + tour.discount + '% of selected departures'}">-10% of selected departures</span>
+                <span class="old-price-value" style="text-decoration: line-through"></span>
+                <small class="old-price-currency" th:text="${tour.currency}" style="display: none">AUD</small>
+            </span>
+            <span th:if="${tour.isStartTourPrice}" class="start-tour-price">
+                </br>
+                <span th:if="${tour.startTourPrice != null && tour.startTourPrice > 0}">+ tour start payment: $<span class="start-tour-price-value" th:text="${tour.startTourPrice.intValue()}">0</span> <small th:text="${tour.startTourPriceCurrencyCode}">AUD</small> <i class="fa fa-info-circle" data-toggle="tooltip" title="This an additional payment due locally at the beginning of your tour. Credit card payments might not be possible."></i></span>
+                <span th:if="${tour.startTourPrice == null || tour.startTourPrice == 0}">a tour start payment may apply <i class="fa fa-info-circle" data-toggle="tooltip" title="This an additional payment due locally at the beginning of your tour. Credit card payments might not be possible."></i></span>
+            </span>
+        </div>
+        <div class="tour-details-side-container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12">
+                    YOUR TOUR DATES
+                    <button class="btn btn-primary btn-wide btn-raised no-padding check-availability-btn" type="button"><span>CHECK AVAILABILITY</span> <i class="fa fa-calendar"></i></button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12">
+                    <div class="btn-container">
+                        <form th:action="${'/booking/' + tour.operatorCode}" method="GET">
+                            <input type="hidden" name="sku" th:value="${tour.sku}">
+                            <input type="hidden" name="productCode">
+                            <input type="hidden" class="start-date" name="startDate">
+                            <button class="btn btn-primary btn-wide btn-raised book-tour" type="submit" style="display: none;">BOOK NOW</button>
+                        </form>
+                        <button class="btn btn-info btn-wide btn-raised compare-tour" type="button" th:data-tour-id="${tour.id}">Compare</button>
+                        <a class="btn btn-info btn-wide btn-raised compare-backpack"
+                           href="/compare-your-tours" type="button" style="display: none;">Go to backpack</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2 col-sm-1 col-xs-2">
+                    <div class="circle"></div>
+                    <div class="line"></div>
+                </div>
+                <div class="tour-map detail col-md-10 col-sm-11 col-xs-10">
+                    <strong>Starts: </strong>
+                    <span th:text="${tour.startCity}">United Kingdom</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2 col-sm-1 col-xs-2">
+                    <div class="circle"></div>
+                    <div class="line"></div>
+                </div>
+                <div class="tour-map detail col-md-10 col-sm-11 col-xs-10">
+                    <strong th:text="${tour.countries != null && tour.countries.size() > 1 ? tour.countries.size() + ' Countries Visited:' : '1 Country Visited:'}">Countries visited: </strong>
+                    <span th:text="${#strings.listJoin(tour.countries, ', ')}"
+                          id="countriesVisited">Vietnam</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2 col-sm-1 col-xs-2">
+                    <div class="circle"></div>
+                </div>
+                <div class="tour-map detail col-md-10 col-sm-11 col-xs-10">
+                    <strong>Finish: </strong>
+                    <span th:text="${tour.finishCity}">Paris</span>
+                </div>
+            </div>
+
+            <div class="operator-logo">
+                <img th:alt="${tour.operatorName}" th:src="${tour.operatorLogoUrl}"/>
+            </div>
+
+            <div class="row read-more-tour-operator">
+                <div class="col-md-12">
+                    <a href="#tourOperator">Read more <i class="fa fa-angle-right"></i></a>
+                </div>
+            </div>
+
+            <div th:if="${supplier != null && supplier.termsAndConditionsUrl != null}" class="row read-more-tour-operator">
+                <div class="col-md-12">
+                    <a th:href="${supplier.termsAndConditionsUrl}" target="_blank">Terms & Conditions <i class="fa fa-angle-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

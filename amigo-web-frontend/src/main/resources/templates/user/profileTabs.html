@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+</head>
+<body>
+
+<ul th:fragment="profileTabs (activTab)"  class="nav nav-tabs info-card-tabs">
+    <li th:class="${activTab == 'profile'} ? 'active' : ''"><a href="/user/profile">User profile</a></li>
+</ul>
+
+</body>
+</html>

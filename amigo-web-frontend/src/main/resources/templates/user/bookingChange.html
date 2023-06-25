@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layouts/main">
+<body>
+<div layout:fragment="content">
+    <!--/*@thymesVar id="error" type="java.lang.String"*/-->
+    <!--/*@thymesVar id="booking" type="com.touramigo.booking.Booking"*/-->
+    <!--/*@thymesVar id="updateBooking" type="com.touramigo.user.UpdateBooking"*/-->
+    <div class="container info-container">
+        <div class="row">
+            <div class="col-sm-12 col-md-offset-2 col-md-8">
+                <a href="/user/booking" class="btn btn-default btn-raised btn-top"><i class="fa fa-angle-left"></i> Back</a>
+            </div>
+        </div>
+        <div class="row">
+            <th:block th:if="${error}">
+                <div th:replace="fragments/validation/alert :: alert (type='danger', message=${error}, errors=null)">
+                    Error
+                </div>
+            </th:block>
+            <div class="col-sm-12 col-md-offset-2 col-md-8 info-card">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h1>User bookings - change booking</h1>
+                        <div th:replace="user/profileTabs :: profileTabs ('booking')"></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <form id="changeBookingForm" method="post" class="form-vertical">
+                            <h2 class="sub-header">Tour Details</h2>
+                            <div th:replace="booking/bookingInformation :: information (${booking}, false)">
+                                Booking information
+                            </div>
+
+                            <h2 class="sub-header">Personal details</h2>
+                            <div th:replace="user/bookingPersonal :: personal (${booking.passengers.get(0)})">
+                                Personal information
+                            </div>
+                            <fieldset>
+                                <div id="changeTourPanel" class="booking-details">
+                                    <h2 class="sub-header">Change Tour</h2>
+                                    <div id="question">Please provide details of your change and if there is another tour or date you are requesting. There may be fees and restrictions from the tour operator for changing your booking, so please provide details as to the reason for your request:</div>
+                                    <div>
+                                        <textarea id="reason" name="reason" rows="5" class="form-control no-resize-horizontal" required="required" th:inline="text">[[${updateBooking.reason}]]</textarea>
+                                    </div>
+                                </div>
+
+                                <div th:replace="user/bookingWarning :: warning">
+                                    Warning
+                                </div>
+
+                                <div>
+                                    <button id="submitChange" type="submit" class="btn btn-primary btn-raised btn-wide">Submit</button>
+                                </div>
+                            </fieldset>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script layout:fragment="custom-script">
+    /*<![CDATA[*/
+    $(function () {
+        $('#changeBookingForm').parsley({});
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

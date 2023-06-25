@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/main">
+
+<title layout:fragment="title">Compare Tours</title>
+<object layout:fragment="meta">
+    <meta name="title" content="Compare Your Tours | Tour Amigo">
+    <meta  name="description" content="Start comparing tours online with our Backpack tool. Compare tours today.">
+</object>
+
+
+<body>
+<div layout:fragment="content">
+    <div class="container backpack-container">
+        <div class="row">
+            <div class="col-md-12">
+                <button id="backToSearchResults" onclick="javascript:history.go(-1);return false;" class="btn btn-default btn-raised btn-top"><i class="fa fa-angle-left"></i> Back</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h3 align="center">Welcome to your Backpack</h3>
+                <h3 align="center">Compare your selections & narrow down the best tour for you! Click &quot;BOOK NOW&quot; to
+                    check availability.</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="row rotate-horizontal hidden-md hidden-lg label-warning">
+        <div class="col-xs-3 text-right">
+            <img src="/image/rotate_horizontal.png">
+        </div>
+        <div class="col-xs-9">
+            <span>Please turn your device horizontally for a better view.</span>
+        </div>
+    </div>
+
+    <div class="container compare-container">
+
+        <div id="loadingBackpack" class="loading-backpack text-center">
+            Loading your backpack<br>
+            <i class="fa fa-spin fa-spinner"></i>
+        </div>
+
+        <div id="backpackEmpty" class="empty-backpack" style="display:none;">
+            <div class="backpack-empty-container">
+                <p>Your Backpack is empty!</p>
+                <p class="smaller">Search for tours, and click ‘Compare’<br/>
+                    to add them to your Backpack</p>
+                <a id="searchAgain" class="btn btn-primary btn-raised">Search</a>
+            </div>
+        </div>
+
+        <div id="comparedToursContainer">
+
+        </div>
+    </div>
+
+    <div th:replace="discount/newsletterSignup :: newsletterSignup">
+    </div>
+</div>
+
+<script layout:fragment="custom-script">
+    /*<![CDATA[*/
+    $(function () {
+        $('#searchAgain').on('click', function(){
+            window.location = localStorage.getItem('history_search');
+        });
+        var COMPARE_TOUR_STORE = 'compare_tour_store';
+        var comparedTours = store(COMPARE_TOUR_STORE);
+        if (comparedTours && comparedTours.length > 0) {
+            $('#backpackEmpty').hide();
+            $.ajax({
+                url: '/compare-your-tours/getTours',
+                data: {comparedTours: comparedTours},
+                type: 'GET',
+                error: function () {
+                    sweetAlert("Oops...", "There was a problem loading tours to compare. Please try again", "error");
+                    $('#loadingBackpack').hide();
+                    $('#backpackEmpty').show();
+                },
+                success: function (res) {
+                    $('#loadingBackpack').hide();
+                    $('#comparedToursContainer').html(res);
+                    var removeTourButton = $('a.remove-tour');
+
+                    // Cleanup store in case of discrepancy
+                    var tourIds = removeTourButton.map(function(idx, elem) {
+                        return $(elem).data('tour-id');
+                    }).get();
+                    comparedTours = tourIds;
+                    store(COMPARE_TOUR_STORE, comparedTours);
+                    $('#toursInBackpack').text(comparedTours.length);
+
+                    if (tourIds && tourIds.length > 0) {
+                        // Attach remove tour button
+                        removeTourButton.on('click', function () {
+                            var tourId = $(this).data('tour-id');
+                            var tourIndex = $.inArray(tourId, comparedTours);
+                            if (tourIndex !== -1) {
+                                comparedTours.splice(tourIndex, 1);
+                                store(COMPARE_TOUR_STORE, comparedTours);
+                                $('#toursInBackpack').text(comparedTours.length);
+                            }
+
+                            var column = $(this).closest("th").prevAll("th").length;
+                            $(this).closest("table").find("tr").find("th:eq(" + column + "), td:eq(" + column + ")").remove();
+
+                            if (comparedTours.length === 0) {
+                                $('#compareTable').remove();
+                                $('#backpackEmpty').show();
+                            }
+                        });
+                    } else {
+                        sweetAlert("Oops...", "There was a problem loading tours to compare. Please try again", "error");
+                        $('#backpackEmpty').show();
+                    }
+                }
+            });
+        } else {
+            $('#backpackEmpty').show();
+            $('#loadingBackpack').hide();
+        }
+
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

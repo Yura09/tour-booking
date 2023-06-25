@@ -1,0 +1,365 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<!--/*@thymesVar id="comparedTours" type="java.util.List<com.touramigo.tour.TourDetails>"*/-->
+<table id="compareTable" class="backpack">
+    <thead>
+    <tr>
+        <th th:each="tour: ${comparedTours}">
+            <div class="compare-header">
+                <div class="remove">
+                    <a class="remove-tour" href="javascript:;" th:data-tour-id="${tour.id}">
+                        REMOVE <i class="fa fa-close"></i>
+                    </a>
+                </div>
+                <div class="tour-image">
+                    <img src="/image/missing_tour_image.png" th:src="${!#strings.isEmpty(tour.primaryImageUrl) ? T(com.touramigo.tour.TourDetails).getResizedImageUrl(tour.primaryImageUrl, 390, 190) : '/image/missing_tour_image.png'}"
+                         th:srcset="${!#strings.isEmpty(tour.primaryImageUrl) ? T(com.touramigo.tour.TourDetails).getResizedImageUrl(tour.primaryImageUrl, 390, 190, 2) : '/image/missing_tour_image.png'} + ' 2x'"
+                         class="img-responsive center-block" th:alt="${tour.title + ' Tour Amigo'}"/>
+                </div>
+                <div class="title">
+                    <a th:href="'/tour/' + ${tour.slug} + '?sku=' + ${tour.sku} + '&org=' + ${tour.operatorCode}" href="/tour" th:text="${tour.title}"></a>
+                </div>
+            </div>
+        </th>
+    </tr>
+    <tr>
+        <th th:each="tour: ${comparedTours}" class="book-now-header">
+            <a style="border: 1px solid #000;" id="seeFull" class="btn btn-default btn-wide btn-raised no-padding"
+               href="/tour" th:href="'/tour/' + ${tour.slug} + '?sku=' + ${tour.sku} + '&amp;org=' + ${tour.operatorCode}">View Tour</a>
+            <button class="btn btn-primary btn-wide btn-raised no-padding check-availability-btn" type="button"><span>BOOK NOW</span> <i class="fa fa-calendar"></i></button>
+            <form th:action="${'/booking/' + tour.operatorCode}" method="GET">
+                <input type="hidden" name="sku" th:value="${tour.sku}">
+                <input type="hidden" class="start-date" name="startDate">
+                <button class="btn btn-primary btn-wide btn-raised book-tour" type="submit" style="display: none;">BOOK NOW</button>
+            </form>
+            <input type="hidden" th:value="${tour.id}" class="tour-id">
+            <input type="hidden" th:if="${tour.duration != null}" th:value="${tour.duration}" class="tour-duration">
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="logo" th:each="tour: ${comparedTours}">
+            <div class="compare-logo">
+                <img id="logo" th:src="${tour.operatorLogoUrl}" th:alt="${tour.operatorName}"
+                     src="https://s3.amazonaws.com/touramigo.public/image/operators/intrepid-logo.jpg"
+                     alt="Intrepid Travel">
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Price</span>
+                $<span th:id="${'baseTourPrice' + tour.id}" th:text="${tour.price} ? ${tour.price.intValue()} : 'NA'">0</span>
+                <small th:text="${tour.currency}">AUD</small>
+
+                <span th:id="${'oldPriceRow' + tour.id}" th:style="${tour.discount != null && tour.discount != 0} ? 'display:block' : 'display:none'">
+                    <br>
+                    <span th:id="${'priceOffText' + tour.id}" th:text="${'-' + tour.discount + '% of selected departures'}">-10% of selected departures</span>
+                    <span th:id="${'oldTourPrice' + tour.id}" style="text-decoration: line-through;"></span>
+                    <small th:id="${'oldPriceCurrency' + tour.id}" th:text="${tour.currency}" style="display: none">AUD</small>
+                </span>
+
+                <span th:if="${tour.isStartTourPrice}" class="start-tour-price">
+                    <br>
+                    <span th:if="${tour.startTourPrice != null && tour.startTourPrice > 0}">+ tour start payment: $<span class="start-tour-price-value" th:text="${tour.startTourPrice.intValue()}">0</span> <small th:text="${tour.startTourPriceCurrencyCode}">AUD</small> <i class="fa fa-info-circle" data-toggle="tooltip" title="This an additional payment due locally at the beginning of your tour. Credit card payments might not be possible."></i></span>
+                    <span th:if="${tour.startTourPrice == null || tour.startTourPrice == 0}">+ a tour start payment may apply <i class="fa fa-info-circle" data-toggle="tooltip" title="This an additional payment due locally at the beginning of your tour. Credit card payments might not be possible."></i></span>
+                </span>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Duration</span>
+                <div th:if="${tour.duration != null}" th:text="${tour.duration > 1 ? tour.duration + ' days' : tour.duration + ' day' }">2 days</div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Countries visited</span>
+                <div class="info">
+                    <ul>
+                        <li th:each="country: ${tour.countries}" th:text="${country}">Myanmar</li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Places visited</span>
+                <div class="info">
+                    <ul>
+                        <li th:each="city: ${tour.cities}" th:text="${city}">Bagan</li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Starts in</span>
+                <div class="info" th:text="${tour.startCity}">Bagan</div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Finishes in</span>
+                <div class="info" th:text="${tour.finishCity}">Bagan</div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Transport</span>
+                <ul>
+                    <li th:each="transport: ${tour.transport}" th:text="${transport}">Bagan</li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Ages</span>
+                <div class="info" th:text="${tour.ageRange != null ? tour.ageRange : '0-99'}">15-80</div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Max group size</span>
+                <div class="info" th:text="${tour.maxGroupSize != 9999 ? tour.maxGroupSize : 'not limited'}">12</div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Tour themes</span>
+                <ul>
+                    <li th:each="theme,themes : ${#strings.arraySplit(tour.theme, ',')}" th:text="${theme}">Short Breaks - Group Adventures, Explorer</li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Accommodation</span>
+                <ul>
+                    <li th:each="accommodation: ${tour.accommodationDetail}" th:utext="${accommodation}">Hotel</li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Meals included</span>
+                <div class="info" th:text="${tour.mealsDetail}">1 breakfast, 1 lunch</div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Departures</span>
+                <button class="btn btn-primary btn-wide btn-raised no-padding check-availability-btn" style="font-weight:bold" type="button"><span>BOOK NOW</span> <i class="fa fa-calendar"></i></button>
+                <form th:action="${'/booking/' + tour.operatorCode}" method="GET">
+                    <input type="hidden" name="sku" th:value="${tour.sku}">
+                    <input type="hidden" class="start-date" name="startDate">
+                    <button class="btn btn-primary btn-wide btn-raised book-tour" type="submit" style="font-weight:bold; display: none;">BOOK NOW</button>
+                </form>
+                <input type="hidden" th:value="${tour.id}" class="tour-id">
+                <input type="hidden" th:if="${tour.duration != null}" th:value="${tour.duration}" class="tour-duration">
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td th:each="tour: ${comparedTours}">
+            <div class="compare-info">
+                <span class="compare-title">Highlights</span>
+                <div class="info">
+                    <ul>
+                        <li th:each="highlight : ${tour.highlights}" th:utext="${highlight}"></li>
+                    </ul>
+                </div>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<script>
+    var availableDates = [(${availableDates})];
+    var inputDateFormat = 'dd-mm-yyyy';
+    var queryMomentDateFormat = 'YYYY-MM-DD';
+    var inputMomentDateFormat = 'DD-MM-YYYY';
+    var baseTourPrice = {};
+    var oldTourPrice = {};
+    var currentDate = new Date();
+    currentDate.setHours(0,0,0,0);
+    var startDates = {};
+    var oldDate = {};
+    for (var tourId in availableDates) {
+        if (availableDates.hasOwnProperty(tourId)) {
+            startDates[tourId] = [];
+            for (var i = 0, availableDatesLength = availableDates[tourId].length; i < availableDatesLength; i++) {
+                availableDates[tourId][i].date = moment(availableDates[tourId][i].date, queryMomentDateFormat).format(inputMomentDateFormat);
+                startDates[tourId].push(availableDates[tourId][i].date);
+            }
+        }
+    }
+
+    var maxDiscount = {};
+    var tours = [(${comparedToursJson})];
+    for (var i = 0; i < tours.length; i++) {
+        var tour = tours[i];
+        maxDiscount[tour.id] = tour.discount;
+    }
+
+    var tourDepartureStart = $('.check-availability-btn');
+    tourDepartureStart.each(function() {
+        var tourDepartureStartInstance = $(this);
+        var tourId = $(this).siblings('.tour-id').val();
+        var tourDuration = $(this).siblings('.tour-duration').val();
+        var bookTourButton = $(this).siblings('form').find('.book-tour');
+        var basePriceContainer = $('#baseTourPrice' + tourId);
+        var oldPriceContainer = $('#oldTourPrice' + tourId);
+        var oldPriceCurrencyContainer = $('#oldPriceCurrency' + tourId);
+        var priceOff = $('#priceOffText' + tourId);
+        var oldPriceRow = $('#oldPriceRow' + tourId);
+        baseTourPrice[tourId] = basePriceContainer.html();
+        oldTourPrice[tourId] = oldPriceContainer.html();
+
+        $(this).datepicker({
+            orientation: 'bottom',
+            autoclose: false,
+            beforeShowDay: function (dateField) {
+                var selectedDate = moment(dateField).format(inputMomentDateFormat);
+                if (startDates[tourId].indexOf(selectedDate) > -1) {
+                    var enabled = true;
+                    var departure  = availableDates[tourId].filter(function(departure){return departure.date === selectedDate;})[0];
+                    var additionalClasses = '';
+                    if ((departure.availability && departure.availability <= 5) || departure.status === 'REQUEST') {
+                        additionalClasses = ' limited';
+                    }
+                    if ((departure.availability != null && departure.availability == 0) || departure.status === 'CLOSED') {
+                        additionalClasses = ' closed';
+                        enabled = false;
+                    }
+
+                    var price = '&nbsp;<br><small class="date-price">$' + departure.price + '</small>';
+                    if (departure.promotionPrice && departure.promotionPrice < departure.price) {
+                        price = '<small class="date-price date-price-inactive">$' + departure.price + '</small><br><small class="date-price">$' + departure.promotionPrice + '</small>'
+                    }
+
+                    return {
+                        enabled: enabled,
+                        classes: 'highlighted' + additionalClasses,
+                        content: moment(dateField).date() + '<br>' + price
+                    }
+                }
+
+                return {
+                    enabled: false
+                }
+            },
+            startDate: currentDate,
+            format: inputDateFormat
+        }).on('changeDate', function (event) {
+            if (event.date) {
+                var selectedDate = moment(event.date, inputMomentDateFormat);
+                var departure  = availableDates[tourId].filter(function(departure){return departure.date === selectedDate.format(inputMomentDateFormat)})[0];
+                $('.start-date').val(selectedDate.format(inputMomentDateFormat));
+                tourDepartureStartInstance.removeClass('btn-primary').addClass('btn-default');
+                tourDepartureStartInstance.find('span').html(selectedDate.format(inputMomentDateFormat) + ' - ' + selectedDate.add(tourDuration, 'days').format(inputMomentDateFormat));
+                if(departure.promotionPrice && departure.promotionPrice < departure.price) {
+                    basePriceContainer.html(departure.promotionPrice);
+                    oldPriceContainer.html(departure.price);
+                    priceOff.html(departure.discount + '% off');
+                    oldPriceRow.show();
+                } else {
+                    basePriceContainer.html(departure.price);
+                    oldPriceContainer.html('');
+                    priceOff.html('');
+                    oldPriceRow.hide();
+                }
+                bookTourButton.show();
+
+                oldDate[tourId] = tourDepartureStartInstance.datepicker('getDate');
+                baseTourPrice[tourId] = basePriceContainer.html();
+                oldTourPrice[tourId] = oldPriceContainer.html();
+                tourDepartureStartInstance.datepicker('hide');
+                oldPriceCurrencyContainer.show();
+            } else {
+                $('.start-date').val('');
+                tourDepartureStartInstance.addClass('btn-primary').removeClass('btn-default');
+                tourDepartureStartInstance.find('span').html('BOOK NOW');
+                basePriceContainer.html(baseTourPrice[tourId]);
+                oldPriceContainer.html('');
+                if (maxDiscount[tourId]) {
+                    priceOff.html('-' + maxDiscount[tourId] + '% of selected departures');
+                    oldPriceCurrencyContainer.hide();
+                    oldPriceRow.show();
+                } else {
+                    oldPriceRow.hide();
+                }
+
+                bookTourButton.hide();
+            }
+        }).on('show', function () {
+            $('.datepicker').addClass('booking-datepicker');
+            var buttonPane = $('.datepicker tfoot');
+            var extendedContent = buttonPane.find('#extendedContent');
+            if (!extendedContent.length) {
+                buttonPane.append('<tr><th colspan="7" id="extendedContent"></th></tr>');
+                extendedContent = buttonPane.find('#extendedContent');
+                extendedContent.append('<div class="legend"><div class="legend-color legend-color-available">&nbsp;</div> AVAILABLE</div><div class="legend"><div class="legend-color legend-color-limited">&nbsp;</div> LIMITED AVAILABILITY / ON REQUEST</div><div class="legend"><div class="legend-color legend-color-closed">&nbsp;</div>SOLD OUT / CLOSED</div>')
+                $( '<button>', {
+                    text: 'Cancel'
+                }).appendTo(extendedContent)
+                    .addClass('btn btn-default btn-raised date-cancel')
+                    .on('click', function () {
+                        if (oldDate[tourId]) {
+                            tourDepartureStartInstance.datepicker('setDate', oldDate[tourId]);
+                        } else {
+                            tourDepartureStartInstance.datepicker('clearDates');
+
+                            basePriceContainer.html(baseTourPrice[tourId]);
+                            oldPriceContainer.html('');
+                            if (maxDiscount[tourId]) {
+                                priceOff.html('-' + maxDiscount[tourId] + '% of selected departures');
+                                oldPriceCurrencyContainer.hide();
+                                oldPriceRow.show();
+                            } else {
+                                oldPriceRow.hide();
+                            }
+                        }
+
+                        tourDepartureStartInstance.datepicker('hide');
+                    });
+
+            }
+        });
+
+        var dateString = readCookie('lastSearchedMonth');
+        if (dateString !== undefined && dateString != '') {
+            $(this).datepicker('update', moment(dateString, 'MM-YYYY').toDate());
+        }
+
+        // Initialize tooltips
+        $('.backpack [data-toggle="tooltip"]').tooltip();
+    });
+
+</script>
+</html>
